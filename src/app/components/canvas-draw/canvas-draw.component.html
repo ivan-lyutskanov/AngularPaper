@@ -1,2 +1,7 @@
-<button (click)="onSave()">Save</button>
-<canvas #canvas></canvas>
+<textarea *ngIf="svgString" > {{ svgString }} </textarea>
+<button (click)="onExport()"> {{svgString ? 'Update' : 'Export' }} </button>
+<button *ngIf="svgString" (click)="onCopyToClipboard()">Copy to Clipboard</button>
+
+<section>
+    <canvas #canvas></canvas>
+</section>

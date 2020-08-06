@@ -1,6 +1,5 @@
 import { Component, ViewChild, ElementRef, AfterViewInit, Input } from '@angular/core';
 import { Raster, Path, Project } from 'paper';
-import { saveAs } from 'file-saver';
 
 @Component({
   selector: 'app-canvas-draw',
@@ -14,6 +13,9 @@ export class CanvasDrawComponent implements AfterViewInit  {
   path: any;
 
   raster: any;
+
+  svgString: string;
+
   @Input() imageURL: string;
 
   @Input() strokeColor = '#c92b39'; // default red
@@ -27,8 +29,13 @@ export class CanvasDrawComponent implements AfterViewInit  {
 
     // Check if image url is provided
     if (this.imageURL) {
+      const img = new Image();
+      // Enable CORS
+      img.crossOrigin = 'anonymous';
+      img.src = this.imageURL;
+
       // Draw the image on the canvas
-      this.raster = new Raster(this.imageURL);
+      this.raster = new Raster(img);
       // Center the image
       this.raster.position = this.project.view.center;
     }
@@ -60,11 +67,12 @@ export class CanvasDrawComponent implements AfterViewInit  {
     this.path.simplify();
   }
 
-  onSave() {
+  onExport() {
+    this.svgString = this.project.exportSVG({asString: true});
+    console.log(this.svgString);
+  }
 
-    this.project.view.draw();
-    console.log(this.project.view.element);
-    // tslint:disable-next-line: only-arrow-functions
-    this.project.view.element.toBlob( function(blob: Blob) { saveAs(blob, 'image.png'); });
+  onCopyToClipboard() {
+    navigator.clipboard.writeText(this.svgString).then(() => console.log('Copied to clipboard!'));
   }
 }
